@@ -1,2 +1,2 @@
 def extract_command(speech_text):
-    return "play music"
+    return speech_text

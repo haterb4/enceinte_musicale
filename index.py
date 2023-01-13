@@ -27,9 +27,13 @@ while True:
             command_word = extract_command(speech_text)
             if 'bonjour' not in command_word:
                 player.play_song(ERROR_NOTFILE_FOUND)
+                player.play_song(ERROR_NOTFILE_FOUND)
+        elif response == 'n':
+            if not player.next_song():
+                player.play_song(ERROR_NOTFILE_FOUND)
         elif response == 'q':
             break
-    new_action = input("new qction? ")
+    new_action = input("new action? ")
     if new_action.lower() in ['non', 'n']:
         perform_action = False
     else:

@@ -6,6 +6,9 @@ import pathlib
 
 class MusicIndexer:
     def __init__(self, dir_name):
+        self.start(dir_name)
+        
+    def start(self, dir_name):
         self.root_dir = dir_name
         self.all_music = []
         self.musics_extensions = [".mp3", ".wav", ".m4a"]
@@ -17,7 +20,7 @@ class MusicIndexer:
         }
         self.state["last"] = len(self.all_music) - 1
         print(self.all_music)
-    
+        
     def load(self, dirname):
         if len(self.all_music) <= 300:
             for sChild in os.listdir(dirname):                
@@ -69,23 +72,24 @@ class MusicPlayer:
         self.indexer = musicIndexer
         if self.indexer.all_music:
             self.indexer.state["current"] = -1
+            self.mixer = mixer
         # Initializing the mixer
-        mixer.init()
+        self.mixer.init()
         
     def play_song(self, song_name):
-        mixer.music.load(song_name)
-        mixer.music.play()
+        self.mixer.music.load(song_name)
+        self.mixer.music.play()
         self.indexer.state["playing"] = True
         return True
     def stop_song(self):
-        mixer.music.stop()
+        self.mixer.music.stop()
         self.indexer.state["playing"] = False
     
     def pause_song(self):
-        mixer.music.pause()
+        self.mixer.music.pause()
         self.indexer.state["playing"] = False
     def resume_song(self):
-        mixer.music.unpause()
+        self.mixer.music.unpause()
         self.indexer.state["playing"] = True
     def next_song(self):
         if self.indexer.all_music:

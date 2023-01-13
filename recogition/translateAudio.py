@@ -17,8 +17,6 @@ def translateSpeechToText(audio_file):
     # recognize speech using Sphinx
     try:
         translated_text = r.recognize_sphinx(audio, "fr-FR")
-        print("Sphinx thinks you said " + translated_text)
-        #print("Google Speech Recognition thinks you said " + r.recognize_google(audio, "fr-FR"))
         return translated_text 
     except sr.UnknownValueError:
         print("Sphinx could not understand audio")
