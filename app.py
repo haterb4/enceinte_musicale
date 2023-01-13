@@ -1,6 +1,7 @@
 from flask import Flask
 from recogition.recordCommandVoice import recordVoice
 from recogition.translateAudio import translateSpeechToText
+from recogition.textToSpeech import textToSpeech
 from command.parser import extract_command
 from os import path
 from player.player import MusicIndexer, MusicPlayer
@@ -9,6 +10,7 @@ import time
 
 
 AUDIO_FILE = path.join(path.dirname(path.realpath(__file__)), "recorded/output.wav")
+AUDIO_FILE_OUTPUT = path.join(path.dirname(path.realpath(__file__)), "recorded/input.wav")
 AUDIO_FOLDER = path.join(path.dirname(path.realpath(__file__)), "worker/musics")
 ERROR_NOTFILE_FOUND = path.join(path.dirname(path.realpath(__file__)), "worker/emcv_responses/musique_introuvable.wav")
 ERREUR_REPETER = path.join(path.dirname(path.realpath(__file__)), "worker/emcv_responses/erreur-ecoute-repeter.wav")
@@ -40,7 +42,7 @@ app = Flask(__name__)
 @app.route("/")
 def configure_first():
     player.play_song(PREMIERE_CONFIGURATION)
-    time.sleep(8)
+    time.sleep(7)
     recordVoice(AUDIO_FILE, RECORD_SECONDS)
     resp = translateSpeechToText(AUDIO_FILE)
     if not "oui" in resp:
@@ -48,9 +50,18 @@ def configure_first():
     #ask tthe user name
     username = ''
     while not username:
-        player.play_song(PLAYLIST)
+        textToSpeech("quel est votre nom?", AUDIO_FILE_OUTPUT)
+        player.play_song(AUDIO_FILE_OUTPUT)
+        time.sleep(4)
         recordVoice(AUDIO_FILE, RECORD_SECONDS)
-        resp = translateSpeechToText(AUDIO_FILE)
+        rep = ''
+        while not rep:
+            try:
+                rep = translateSpeechToText(AUDIO_FILE)
+            except:
+                recordVoice(AUDIO_FILE, RECORD_SECONDS)
+                
+            
         print("end recording")
         if resp:
             yes = input("votre nom est il {}?".format(resp))
@@ -62,6 +73,7 @@ def configure_first():
                    break  
         else:
             player.play_song(PAS_DE_CONNEXION)
+            time.sleep(4)
     return { "status": "success"}
     
 @app.route("/musicplayer/play")
